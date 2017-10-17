@@ -14,7 +14,7 @@ import os
 import csv
 import arcpy
 import shutil
-
+import pythonaddins
 
 path = r"C:/AIS_Data/"
 AisGDB  = "ais.gdb"
@@ -26,12 +26,8 @@ AisGdbPath = path + AisGDB
 ##================================================================
 def cleanCSV():
     # Refresh the Catalog window for the new directory
-    arcpy.RefreshCatalog("C:\AIS_Data")
-    os.system("TASKKILL /F /IM ArcCatalog.exe")
-    os.system("TASKKILL /F /IM ArcMap.exe")
     csv1 =  'C:/AIS_Data/ais_live.csv'
     csv2 =  'C:/AIS_Data/ais_live_edit.csv'
-
     with open(csv1,'r') as f, open(csv2,'w') as f1:
         next(f) # skip header line
         next(f)
@@ -40,7 +36,9 @@ def cleanCSV():
 
     arcpy.Delete_management(csv1)
     shutil.move(csv2,  csv1)
-
+    arcpy.RefreshCatalog("C:\AIS_Data")
+    #os.system("TASKKILL /F /IM ArcCatalog.exe")
+    #os.system("TASKKILL /F /IM ArcMap.exe")
 
 ##================================================================
 
@@ -79,16 +77,31 @@ def importCSVTTable ():
 
 def deleteFiles():
 
-    arcpy.Delete_management("C:/AIS_Data/schema.ini")
+    #arcpy.Delete_management("C:/AIS_Data/schema.ini")
     arcpy.Delete_management("C:/AIS_Data/ais.lyr")
     arcpy.Delete_management("C:/AIS_Data/ais.gdb/ais")
     arcpy.Delete_management("C:/AIS_Data/ais.gdb/AIS_FC")
 
 ##================================================================
+
+def removeInvalidRow (): # remove row that has invalide Lat and Lon
+    fc = "C:/AIS_Data/ais.gdb/ais"
+    field = "Longitude"
+    cursor = arcpy.SearchCursor(fc)
+    with arcpy.da.UpdateCursor(fc, ["Longitude", "Latitude"]) as cursor:
+        for row in cursor:
+            if row[0] == None:
+                print "this is null"
+                #print(row.getValue("Vessel_ID"))
+                cursor.deleteRow()
+
+
+##================================================================
+
 if __name__ == '__main__':
     #create new GDB for data
 
-
+    arcpy.RefreshCatalog(path)
     cleanCSV()
     deleteFiles()
     if not arcpy.Exists(AisGdbPath):
@@ -106,9 +119,9 @@ if __name__ == '__main__':
             # add new ais table
             importCSVTTable()
 
-
+    removeInvalidRow()
     createAISFeatureClass()
-
+    #pythonaddins.MessageBox('Select a data frame', 'INFO', 0)
 
 ##================================================================
 
