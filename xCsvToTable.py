@@ -70,7 +70,7 @@ def createAISFeatureClass():
 
 
 ##================================================================
-def importCSVTTable ():
+def importCSVTTable ():  # Import CSV information to geodata table
      #arcpy.Delete_management(AisGdbPath)
 
      arcpy.TableToTable_conversion(csvFile, AisGdbPath, aisTable)
@@ -91,7 +91,7 @@ def removeInvalidRow (): # remove row that has invalide Lat and Lon
     with arcpy.da.UpdateCursor(fc, ["Longitude", "Latitude"]) as cursor:
         for row in cursor:
             if row[0] == None:
-                print "this is null"
+                #print "this is null"
                 #print(row.getValue("Vessel_ID"))
                 cursor.deleteRow()
 
@@ -99,7 +99,6 @@ def removeInvalidRow (): # remove row that has invalide Lat and Lon
 ##================================================================
 
 if __name__ == '__main__':
-    #create new GDB for data
 
     arcpy.RefreshCatalog(path)
     cleanCSV()
