@@ -43,7 +43,7 @@ def cleanCSV():
 ##================================================================
 
 def createAISFeatureClass():
-
+    print "Creating Feature Class"
     arcpy.env.workspace = "C:/AIS_Data/ais.gdb"
     ##
     # Set the local variables

@@ -5,8 +5,6 @@
 # Import system modules
 import arcpy
 import os
-
-from datetime import datetime
 from ConvertTimeZoneModule import *
 
 def killArcGISProcesses():
@@ -21,17 +19,17 @@ def killArcGISProcesses():
 
 
 #works: remove row that has no valid Lat nor long
-def removeInvalidRow (): # remove row that has invalide Lat and Lon
-    fc = "C:/AIS_Data/ais.gdb/ais"
-    field = "Longitude"
-    cursor = arcpy.SearchCursor(fc)
-    with arcpy.da.UpdateCursor(fc, ["Longitude", "Latitude"]) as cursor:
-        for row in cursor:
-            if row[0] == None:
-                print "this is null"
-                #print(row.getValue("Vessel_ID"))
-                cursor.deleteRow()
-
+##def removeInvalidRow (): # remove row that has invalide Lat and Lon
+##    fc = "C:/AIS_Data/ais.gdb/ais"
+##    field = "Longitude"
+##    cursor = arcpy.SearchCursor(fc)
+##    with arcpy.da.UpdateCursor(fc, ["Longitude", "Latitude"]) as cursor:
+##        for row in cursor:
+##            if row[0] == None:
+##                print "this is null"
+##                #print(row.getValue("Vessel_ID"))
+##                cursor.deleteRow()
+##
 
 
 # add date field into table
