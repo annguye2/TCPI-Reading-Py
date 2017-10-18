@@ -4,7 +4,31 @@
 
 # Import system modules
 import arcpy
+import os
+##import psutil
 from datetime import datetime
+from ConvertTimeZoneModule import *
+
+def killArcGISProcesses():
+    print "Kill Arc Catalog or Arc Map Process"
+##    for pidID in pidList:
+##      process = psutil.Process(pidID)
+##      pidName = process.name()
+##      if (pidName == "ArcCatalog.exe"):
+    print "Kill Arc Catalog Process"
+    os.system("TASKKILL /F /IM ArcCatalog.exe")
+##    if (pidName == "ArcMap.exe"):
+    print "Kill Arc Map Process"
+    os.system("TASKKILL /F /IM ArcMap.exe")
+
+
+
+
+##class Test:
+##    def __init__(self):
+##      print "construction"
+##    def writeHello(self):
+##        print "Hello From Class"
 
 
 
@@ -25,19 +49,19 @@ def removeInvalidRow (): # remove row that has invalide Lat and Lon
 # add date field into table
 
 # set value to  Date Field into Table
-def setValueToField():
-
-    print "format date time zone values"
-    fc = "C:/AIS_Data/ais.gdb/ais"
-    dateField = "Date_tag_last_rpt__GMT_"
-    field2 = "Time_tag_last_rpt__GMT_"
-
-    cursor = arcpy.UpdateCursor(fc)
-    for row in cursor:
-        # field2 will be equal to field1 multiplied by 3.0
-        print row.getValue(dateField)
-        row.setValue(dateField, "new value") #set value to dateField colum
-        cursor.updateRow(row)
+##def setValueToField():
+##
+##    print "format date time zone values"
+##    fc = "C:/AIS_Data/ais.gdb/ais"
+##    dateField = "Date_tag_last_rpt__GMT_"
+##    field2 = "Time_tag_last_rpt__GMT_"
+##
+##    cursor = arcpy.UpdateCursor(fc)
+##    for row in cursor:
+##        # field2 will be equal to field1 multiplied by 3.0
+##        print row.getValue(dateField)
+##        row.setValue(dateField, "new value") #set value to dateField colum
+##        cursor.updateRow(row)
 
 
 #=============For adding new date and Time field and reformat ===============
@@ -54,14 +78,12 @@ def convertingTimeZone(): #  this work with date foramt properly look at the tab
         arcpy.ConvertTimeZone_management(inTable, inputTimeField, inputTimeZone, outputTimeField, onputTimeZone, inputUseDaylightSaving, outputUseDaylightSaving)
     except:
         print " invalid value "
-
-
     print"Remove TempDateTime"
     arcpy.DeleteField_management("C:/AIS_Data/ais.gdb/ais",
                              ["tmp_Date_time"])
 ##=======================================
 def addDateFieldIntoTable():
-    print "add new field"
+    print "add Date_Time field"
     arcpy.env.workspace = "C:/AIS_Data/ais.gdb"
     # Set local variables
     inFeatures = "ais"  #table name
@@ -99,28 +121,33 @@ def buildDateTimeInfo():
     dateTimeField = "tmp_Date_Time"
     cursor = arcpy.UpdateCursor(fc)
     for row in cursor:
-        print row.getValue(timeField)
+##        print row.getValue(timeField)
         tmp_time = datetime.strptime(row.getValue(timeField), "%H:%M:%S")
         _time = tmp_time.strftime("%I:%M:%S %p")
-        print _time
+##        print _time
         dateStr = formatDate(row.getValue(dateField)) + " " + _time
         row.setValue(dateTimeField, dateStr) #set value to dateField colum
         cursor.updateRow(row)
 
+
+#  This  function conver GMT time zone to Eastern Standard Time Zone
+#  Call this function on the main to get table has new Time Zone
+def setNewTimeZone():
+    print "Set New Time Zone "
+    killArcGISProcesses()
+    addDateFieldIntoTable()  #works
+    buildDateTimeInfo()      #works
+    convertingTimeZone()
 ##=============== Main ====================
 if __name__ == '__main__':
     print "Main"
-   # removeInvalidRow() # works
-   # convertingTimeZone ()  #works
-    #setValueToField()
 
-
-##    addDateFieldIntoTable()  #works
-##    buildDateTimeInfo()      #works
-    convertingTimeZone()
-##    print formatDate("Mon 19Dec2017")
-
-
+    t =  Test()
+    t.writeHello()
+    converTimeZone  = ConvertingTimeZone()
+    converTimeZone.sayHello()
+    converTimeZone.setNewTimeZone()
+##    setNewTimeZone()
 
 
     print "End Main"
