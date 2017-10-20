@@ -31,10 +31,10 @@ class ConvertingTimeZone:
       self.tmp_date_time  = "Tmp_Date_Time" # Temp Field holds GMT date time format
 
     #=============For adding new date and Time field and reformat ===============
-    def convertingTimeZone(self): #  this work with date foramt properly look at the table "test " in Y drive
-        inputTimeField = "tmp_Date_Time"
+    def convertingTimeZone(self, inputTimeField, outputTimeField): #  this work with date foramt properly look at the table "test " in Y drive
+##        inputTimeField = "tmp_Date_Time"
         inputTimeZone = "Greenwich_Standard_Time"
-        outputTimeField = "Date_Time"
+##        outputTimeField = "Date_Time"
         onputTimeZone = "Eastern_Standard_Time"
         inputUseDaylightSaving = "INPUT_ADJUSTED_FOR_DST"
         outputUseDaylightSaving = "OUTPUT_ADJUSTED_FOR_DST"
@@ -77,11 +77,11 @@ class ConvertingTimeZone:
         newDateFormat = self.getMonth(monthStr) + "/" + dayStr + "/" + yearStr + " "
         return newDateFormat
     ##=======================================
-    def buildDateTimeInfo(self, timeField):
+    def buildDateTimeInfo(self, timeField, dateTimeField):
         print"build data-time information"
         dateStr =  ""
         dateField = "Date_tag_last_rpt__GMT_"
-        dateTimeField = "tmp_Date_Time"
+##        dateTimeField = "tmp_Date_Time"
         cursor = arcpy.UpdateCursor(self.inTable)
         for row in cursor:
             tmp_time = datetime.strptime(row.getValue(timeField), "%H:%M:%S")
@@ -97,7 +97,7 @@ class ConvertingTimeZone:
         cursor = arcpy.UpdateCursor(inTable)
         for row in cursor:
             # field2 will be equal to field1 multiplied by 3.0
-            print row.getValue(timeField)
+##            print row.getValue(timeField)
             row.setValue(fieldToFill, row.getValue(timeField)) #set value to dateField colum
             cursor.updateRow(row)
 
@@ -112,8 +112,8 @@ class ConvertingTimeZone:
         self.addDateFieldIntoTable("TEXT", self.temp)
         #set time field to temp
         self.setValueToField("temp", self.inTable)
-        self.buildDateTimeInfo("temp")      #works
-        self.convertingTimeZone()
+        self.buildDateTimeInfo("temp","tmp_Date_Time")      #works
+        self.convertingTimeZone("tmp_Date_Time", "Eastern_Standard_Time")
         self.deleteFields(["temp", "tmp_Date_Time"]) # clean up created temp fields
 
 ##==================================##==================================

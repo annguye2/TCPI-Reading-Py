@@ -14,8 +14,9 @@ import os
 import csv
 import arcpy
 import shutil
+import pythonaddins
 from ConvertTimeZoneModule import *
-from CreateGeoSpatialTable import *
+from Creat
 
 path = r"C:/AIS_Data/"
 AisGDB  = "ais.gdb"
@@ -58,6 +59,7 @@ def createAISFeatureClass():
     # Set the spatial reference
     spRef = r"Coordinate Systems\Graphic Coordinate Systems\World\WGS 1984.prj"
     #spRef = r"Coordinate Systems\Projected Coordinate Systems\Utm\Nad 1983\NAD 1983 UTM Zone 11N.prj"
+    print "right here"
     #spRef = r"GCS_WGS_1984"
     print "can't add spRef here"
     # Make the XY event layer...
@@ -100,6 +102,7 @@ def removeInvalidRow (): # remove row that has invalide Lat and Lon
 
 if __name__ == '__main__':
 
+
 ##    arcpy.RefreshCatalog(path)
 ##    cleanCSV()
 ##    deleteFiles()
@@ -122,14 +125,6 @@ if __name__ == '__main__':
 ##    converTimeZone  = ConvertingTimeZone("C:/AIS_Data/ais.gdb/ais")
 ##    converTimeZone.setNewTimeZone()
 ##    createAISFeatureClass()
-##    #pythonaddins.MessageBox('Select a data frame', 'INFO', 0)
-
 
 ##================================================================
-
-   creatingSpatialFeature = CreateGeoSpatialTable("Hello From CreateGeoSpatialTable")
-   creatingSpatialFeature.printHello()
-   creatingSpatialFeature.creatingAISFeatureClassFromCSVFile()
-##   converTimeZone  = ConvertingTimeZone("C:/AIS_Data/ais.gdb/ais")
-##   converTimeZone.setNewTimeZone()
 
