@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
 ##================================================================
 
-   creatingSpatialFeature = CreateGeoSpatialTable("Hello From CreateGeoSpatialTable")
+   creatingSpatialFeature = CreateGeoSpatialTable("Start creating AIS Geospatial table")
    creatingSpatialFeature.printHello()
    creatingSpatialFeature.creatingAISFeatureClassFromCSVFile()
 ##   converTimeZone  = ConvertingTimeZone("C:/AIS_Data/ais.gdb/ais")

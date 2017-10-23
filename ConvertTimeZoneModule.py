@@ -1,8 +1,8 @@
 #-------------------------------------------------------------------------------
-# Name:        Test
-# Purpose:
+# Name:        Converting Time Zone
+# Purpose:     Converting Time Zone for AIS Live Data
 #
-# Author:      524855
+# Author:      An Nguyen (524855)
 #
 # Created:     17/10/2017
 # Copyright:   (c) 524855 2017
@@ -78,7 +78,7 @@ class ConvertingTimeZone:
         return newDateFormat
     ##=======================================
     def buildDateTimeInfo(self, timeField, dateTimeField):
-        print"build data-time information"
+        print"Build data-time information"
         dateStr =  ""
         dateField = "Date_tag_last_rpt__GMT_"
 ##        dateTimeField = "tmp_Date_Time"
@@ -92,7 +92,7 @@ class ConvertingTimeZone:
 
     ##===================================================
     def setValueToField(self, fieldToFill, inTable ):
-        print "Set values into new field"
+        print "Set values into new field:   ", fieldToFill
         timeField = "Time_tag_last_rpt__GMT_"
         cursor = arcpy.UpdateCursor(inTable)
         for row in cursor:
@@ -104,7 +104,7 @@ class ConvertingTimeZone:
     ##==================================
     #  Call this function on the main to get table has new Time Zone
     def setNewTimeZone(self):
-        print "Set New Time Zone "
+        print "Set new time zone"
         self.addDateFieldIntoTable("DATE", self.tmp_date_time)# Creating temporary field (type Date)for Date Time
 ##        Creating temp field (type text) to hold Time_tag_last_rpt__GMT_ values since
 ##        values in that field sometimes type Date, sometime type TEXT, so creating this field to make sure the app

@@ -98,11 +98,11 @@ class CreateGeoSpatialTable:
         if not arcpy.Exists(self.AisGdbPath):
             arcpy.CreateFileGDB_management(self.path, self.AisGDB)
             self.importCSVTTable()
-            print ('gdb is NOT  exist')
+##            print ('gdb is NOT  exist')
         else:
-            print ('gdb is  exist')
+##            print ('gdb is  exist')
             if arcpy.Exists("C:/AIS_Data/ais.gdb/ais"):
-                print ("table is exist then remove the ais table")
+##                print ("table is exist then remove the ais table")
                 arcpy.Delete_management("C:/AIS_Data/ais.gdb/ais")
                 self.importCSVTTable()
             else:
