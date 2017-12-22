@@ -102,7 +102,7 @@ class PublishMap:
             # Execute UploadServiceDefinition. This uploads the service definition and publishes the service.
         ##    arcpy.UploadServiceDefinition_server(sd, con)
             arcpy.UploadServiceDefinition_server(sd, con, "", "", "EXISTING", serverFolder)
-            print "Service successfully published"
+            print "Service successfully published AIS feature to ArcGIS Services"
         else:
             print "Service could not be published because errors were found during analysis."
 
@@ -121,8 +121,9 @@ class PublishMap:
         now = datetime.datetime.now()
         print now.strftime("%Y-%m-%d %H:%M:%S")
         self.publishMapToArcGISServer()
-        print "Done"
+        print "Publishing process is done"
         now = datetime.datetime.now()
+        print "End: "
         print now.strftime("%Y-%m-%d %H:%M:%S")
 
     except ValueError:
