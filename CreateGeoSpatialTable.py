@@ -1,8 +1,8 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        mCreateGeoSpatialTablele1
 # Purpose:
 #
-# Author:      524855
+# Author:      An Nguyen
 #
 # Created:     18/10/2017
 # Copyright:   (c) 524855 2017
@@ -14,6 +14,11 @@ import csv
 import arcpy
 import shutil
 from ConvertTimeZoneModule import *
+from FilterDuplicationsModule import *
+from DefineDistanceModule import *
+
+
+env.overwriteOutput = True
 
 class CreateGeoSpatialTable:
     def __init__(self, _msg):
@@ -30,88 +35,160 @@ class CreateGeoSpatialTable:
         print self.msg
     ##=============================================
     def cleanCSV(self):
-        print "Clean CSV"
-        csv1 =  'C:/AIS_Data/ais_live.csv'
-        csv2 =  'C:/AIS_Data/ais_live_edit.csv'
-        with open(csv1,'r') as f, open(csv2,'w') as f1:
-            next(f) # skip header line
-            next(f)
-            for line in f:
-                f1.write(line)
+        try:
 
-        arcpy.Delete_management(csv1)
-        shutil.move(csv2,  csv1)
-        arcpy.RefreshCatalog("C:\AIS_Data")
-        #os.system("TASKKILL /F /IM ArcCatalog.exe")
-        #os.system("TASKKILL /F /IM ArcMap.exe")
+            print "Clean CSV"
+            csv1 =  'C:/AIS_Data/ais_live.csv'
+            csv2 =  'C:/AIS_Data/ais_live_edit.csv'
+            with open(csv1,'r') as f, open(csv2,'w') as f1:
+                next(f) # skip header line
+                next(f)
+                for line in f:
+                    f1.write(line)
+            arcpy.Delete_management(csv1)
+            shutil.move(csv2,  csv1)
+            arcpy.RefreshCatalog("C:\AIS_Data")
+
+        except ValueError:
+            print "cleanCSV error"
+
     ##=============================================
     def importCSVTTable (self):  # Import CSV information to geodata table
-        print "Import CSV table"
-        arcpy.TableToTable_conversion(self.csvFile, self.AisGdbPath, self.aisTable)
+        try:
+            print "Import CSV table"
+            arcpy.TableToTable_conversion(self.csvFile, self.AisGdbPath, self.aisTable)
+
+        except ValueError:
+            print "importCSVTTable error"
 
     ##=============================================
     def deleteFiles(self):
-        print "Delete all gdb features"
-        arcpy.Delete_management("C:/AIS_Data/ais.lyr")
-        arcpy.Delete_management("C:/AIS_Data/ais.gdb/ais")
-        arcpy.Delete_management("C:/AIS_Data/ais.gdb/AIS_FC")
+        try:
+
+            print "Delete all gdb features"
+            arcpy.Delete_management("C:/AIS_Data/AIS_layer_temp.lyr")
+            arcpy.Delete_management("C:/AIS_Data/ais.gdb/ais")
+    ##        arcpy.Delete_management("C:/AIS_Data/ais.gdb/AIS_FC")
+        except ValueError:
+            print "deleteFiles"
+
     ##=============================================
     def removeInvalidRow (self): # remove row that has invalide Lat and Lon
-        print "Remove invalid rows"
-        fc = "C:/AIS_Data/ais.gdb/ais"
-        field = "Longitude"
-        cursor = arcpy.SearchCursor(fc)
-        with arcpy.da.UpdateCursor(fc, ["Longitude", "Latitude"]) as cursor:
-            for row in cursor:
-                if row[0] == None:
-                    #print "this is null"
-                    #print(row.getValue("Vessel_ID"))
-                    cursor.deleteRow()
+        try:
+            print "Remove invalid rows"
+            fc = "C:/AIS_Data/ais.gdb/ais"
+            field = "Longitude"
+            cursor = arcpy.SearchCursor(fc)
+            with arcpy.da.UpdateCursor(fc, ["Longitude", "Latitude"]) as cursor:
+                for row in cursor:
+                    if row[0] == None:
+                        #print "this is null"
+                        #print(row.getValue("Vessel_ID"))
+                        cursor.deleteRow()
+        except ValueError:
+            print "deleteFiles"
 
      ##=============================================
-    def createAISFeatureClass(self):
-        print "Creating Feature Class"
-        arcpy.env.workspace = "C:/AIS_Data/ais.gdb"
-        # Set the local variables
-        in_Table = "ais"
-        x_coords = "Longitude"
-        y_coords = "Latitude"
-        z_coords = ""
-        out_Layer = "ais_layer"
-        saved_Layer = r"C:\AIS_Data\ais.lyr"
-        # Set the spatial reference
-        spRef = r"Coordinate Systems\Graphic Coordinate Systems\World\WGS 1984.prj"
-        #spRef = r"Coordinate Systems\Projected Coordinate Systems\Utm\Nad 1983\NAD 1983 UTM Zone 11N.prj"
-        #spRef = r"GCS_WGS_1984"
-        # Make the XY event layer...
-        arcpy.MakeXYEventLayer_management(in_Table, x_coords, y_coords, out_Layer, spRef, z_coords)
-        # Print the total rowsz
-        print arcpy.GetCount_management(out_Layer)
-        # Save to a layer file
-        arcpy.SaveToLayerFile_management(out_Layer, saved_Layer)
-        arcpy.CopyFeatures_management("ais_layer", "C:/AIS_Data/ais.gdb/AIS_FC")
-    ##=============================================
+    def createAISFeatureClass(self, fc, layerName):
+        try:
+            print "Creating Feature Class"
+            in_Table = "ais"
+            x_coords = "Longitude"
+            y_coords = "Latitude"
+            z_coords = ""
+            out_Layer = "ais_layer"
+            saved_Layer = layerName #r"C:\AIS_Data\ais.lyr"
+            # Set the spatial reference
+            spRef = r"Coordinate Systems\Graphic Coordinate Systems\World\WGS 1984.prj"
+            #spRef = r"Coordinate Systems\Projected Coordinate Systems\Utm\Nad 1983\NAD 1983 UTM Zone 11N.prj"
+            #spRef = r"GCS_WGS_1984"
+            # Make the XY event layer...
+            arcpy.MakeXYEventLayer_management(in_Table, x_coords, y_coords, out_Layer, spRef, z_coords)
+            # Print the total rowsz
+            print arcpy.GetCount_management(out_Layer)
+            # Save to a layer file
+            arcpy.SaveToLayerFile_management(out_Layer, saved_Layer)
+    ##        arcpy.CopyFeatures_management("ais_layer", "C:/AIS_Data/ais.gdb/AIS_FC_Tmp")
+            arcpy.CopyFeatures_management("ais_layer", "C:/AIS_Data/ais.gdb/" + fc)
+
+        except ValueError:
+            print "deleteFiles"
+
+
+##===================================================
     def creatingAISFeatureClassFromCSVFile(self):
-        arcpy.RefreshCatalog(self.path)
-        self.cleanCSV()
-        self.deleteFiles()
-        if not arcpy.Exists(self.AisGdbPath):
-            arcpy.CreateFileGDB_management(self.path, self.AisGDB)
-            self.importCSVTTable()
-##            print ('gdb is NOT  exist')
-        else:
-##            print ('gdb is  exist')
-            if arcpy.Exists("C:/AIS_Data/ais.gdb/ais"):
-##                print ("table is exist then remove the ais table")
-                arcpy.Delete_management("C:/AIS_Data/ais.gdb/ais")
+        try:
+
+            print "START creating geospatial features"
+            arcpy.RefreshCatalog(self.path)
+            self.cleanCSV()
+            filterDuplication = RemoveDup('C:/AIS_Data/ais.gdb/ais')
+            converTimeZone    = ConvertingTimeZone("C:/AIS_Data/ais.gdb/ais")
+    ##        distantFilter     = FindDistance(r"C:/AIS_Data/ais.gdb/AIS_FC_TEMP")
+
+            self.deleteFiles()
+            if not arcpy.Exists(self.AisGdbPath):
+                arcpy.CreateFileGDB_management(self.path, self.AisGDB)
+                print ('gdb is NOT  exist. Create AIS GDB')
                 self.importCSVTTable()
+                self.removeInvalidRow()
+                #filter duplication
+                filterDuplication.filterDuplicationRecords()
+                #creating TimeZone
+                converTimeZone.setNewTimeZone()
+                #creating temp_AIS_FC()
+                self.createAISFeatureClass("AIS_FC_TEMP", r"C:\AIS_Data\AIS_layer_temp")
+                #set projection for joining
+                distantFilter     = FindDistance(r"C:/AIS_Data/ais.gdb/AIS_FC_TEMP")
+                distantFilter.project()
+                print('sucessfully projeted fc.')
+                #join to SYS_SEGMENT_CABLE_SYS
+                distantFilter.join()
+                print('sucessfully joined with SYS_SEGMENT_SYS.')
+                # filter the distance from AIS to Cable System
+    ##            distantFilter.distanceFilter()   # find distance
+                distantFilter.renameFC_To_AIS_FC()
+                print "Successful created and filtered the distance AIS_FC"
+
             else:
-                # add new ais table
-                self.importCSVTTable()
+                print ('GDB is already existed')
+                if arcpy.Exists("C:/AIS_Data/ais.gdb/AIS_FC"):
+                    print ("AIS_FC is already created", "Remove ais table", "Create new ais table")
+                    arcpy.Delete_management("C:/AIS_Data/ais.gdb/ais") #remove ais table
+                    self.importCSVTTable()  # re-creating geospatial table with latest data
+                    self.removeInvalidRow()
+                    filterDuplication.filterDuplicationRecords()
+                    converTimeZone.setNewTimeZone()
+                    print "Creating AIS_FC_Temp"
+                    self.createAISFeatureClass("AIS_FC_TEMP", r"C:\AIS_Data\AIS_layer_temp")
+                    print "Successfull created AIS_FC_TEMP"
 
-        self.removeInvalidRow()
-        converTimeZone  = ConvertingTimeZone("C:/AIS_Data/ais.gdb/ais")
-        converTimeZone.setNewTimeZone()
-        self.createAISFeatureClass()
-        #pythonaddins.MessageBox('Select a data frame', 'INFO', 0)
+                    distantFilter     = FindDistance(r"C:/AIS_Data/ais.gdb/AIS_FC_TEMP")
+                    distantFilter.project()
+                    print('sucessfully projeted fc.')
+                    #join to SYS_SEGMENT_CABLE_SYS
+                    distantFilter.join()
+                    print('sucessfully joined with SYS_SEGMENT_SYS.')
+                    # filter the distance from AIS to Cable System
+    ##                distantFilter.distanceFilter()   # find distance
 
+
+                    self.appendFeatureClasses(r"C:\AIS_Data\ais.gdb\AIS_FC", r"C:\AIS_Data\ais.gdb\JOINED_AIS_FC")
+                    print "Remove AIS_FC_TEMP and AIS_layer_temp.lyr after successfully appeding"
+                    arcpy.Delete_management("C:/AIS_Data/ais.gdb/AIS_FC_TEMP") #remove AIS_FC_TEMP after merge table
+                    arcpy.Delete_management("C:\AIS_Data\AIS_layer_temp.lyr")
+
+        except ValueError:
+            print "creatingAISFeatureClassFromCSVFile"
+
+    ##=============================================
+    ## Appending AIS_FC_TEMP with AIS_FC
+    def appendFeatureClasses(self, fc1, fc2):
+
+        print "Merge AIS_FC_TEMP to AIS_FC"
+        try:
+         arcpy.env.workspace = "C:/AIS_DATA"
+         arcpy.Append_management([fc2], fc1, "NO_TEST","","")
+         print "Appending completed"
+        except:
+         print("error: ", arcpy.GetMessages())
